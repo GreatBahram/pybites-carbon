@@ -13,6 +13,13 @@ def get_code_from_file(filename: str) -> str:
         return fp.read()
 
 
+def environ_or_required(key: str) -> dict:
+    if os.environ.get(key):
+        return {"default": os.environ.get(key)}
+    else:
+        return {"required": True}
+
+
 def get_args():
     parser = argparse.ArgumentParser(
         description="Create a carbon code image",
@@ -41,6 +48,18 @@ def get_args():
         action="store_true",
         default=False,
         help="Run Selenium in interactive (not headless) mode",
+    )
+    parser.add_argument(
+        "-w",
+        "--webdriver",
+        help="Which selenium webdriver to use",
+        choices=["firefox", "chrome"],
+        default="chrome",
+    )
+    parser.add_argument(
+        "--driver-path",
+        help="Where the webdriver is located, accept value from environment variable as well (DRIVER_PATH)",
+        **environ_or_required("DRIVER_PATH"),
     )
     parser.add_argument(
         "-l", "--language", help="Programming language", default="python"
